@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --radius: 1rem;
+  }
+  html,
+  body {
+    background-color: #fbf3e4;
+    color: #1a1614;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    font-family: var(--font-body), system-ui, -apple-system, "Segoe UI",
+      Roboto, sans-serif;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display), Impact, "Bebas Neue", sans-serif;
+    letter-spacing: -0.005em;
+  }
+  /* Hide horizontal scrollbar on category tab strip */
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  ::selection {
+    background: #f5b400;
+    color: #1a1614;
+  }
+}
