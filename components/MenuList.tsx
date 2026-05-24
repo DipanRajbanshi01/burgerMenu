@@ -60,10 +60,10 @@ export function MenuList({
       />
 
       {/* Hero brand block */}
-      <div className="relative shrink-0 px-6 pt-6 sm:px-8 sm:pt-8">
+      <div className="relative shrink-0 px-5 pt-5 sm:px-8 sm:pt-8">
         <h1
-          className="font-display leading-[0.78] tracking-tight text-charcoal"
-          style={{ fontSize: "clamp(3.4rem, 7vw, 6rem)" }}
+          className="font-display leading-[0.82] tracking-tight text-charcoal"
+          style={{ fontSize: "clamp(2.6rem, 7vw, 6rem)" }}
         >
           {config.brandName.split(" ")[0]}
           <span className="block text-cream drop-shadow-[2px_2px_0_rgba(26,22,20,0.5)]">
@@ -127,7 +127,7 @@ export function MenuList({
       </div>
 
       {/* Scrollable list */}
-      <div className="relative mt-4 flex-1 overflow-y-auto px-6 pb-6 sm:px-8">
+      <div className="relative mt-4 flex-1 overflow-y-auto px-5 pb-6 sm:px-8">
         {grouped.length === 0 ? (
           <p className="py-12 text-center text-sm text-charcoal/60">
             Nothing matches "{query}".
@@ -160,7 +160,7 @@ export function MenuList({
       </div>
 
       {/* Footer block */}
-      <div className="relative shrink-0 border-t border-charcoal/15 px-6 py-3 text-[10px] uppercase tracking-[0.2em] text-charcoal/65 sm:px-8">
+      <div className="relative shrink-0 border-t border-charcoal/15 px-5 py-3 text-[10px] uppercase tracking-[0.2em] text-charcoal/65 sm:px-8">
         Delivers to {config.deliveryZones.slice(0, 2).join(", ")}+ · ~
         {config.etaMinutes} min · Min Rs. {config.minOrder}
       </div>
@@ -253,7 +253,7 @@ function PriceCol({
   accent?: boolean;
 }) {
   return (
-    <span className="flex w-[78px] shrink-0 flex-col items-end leading-tight">
+    <span className="flex w-[60px] shrink-0 flex-col items-end leading-tight sm:w-[78px]">
       <span
         className={cn(
           "text-[8px] font-bold uppercase tracking-[0.15em]",
@@ -264,7 +264,7 @@ function PriceCol({
       </span>
       <span
         className={cn(
-          "font-display text-[15px] tabular-nums",
+          "font-display tabular-nums text-[13px] sm:text-[15px]",
           accent
             ? active
               ? "text-sunshine"

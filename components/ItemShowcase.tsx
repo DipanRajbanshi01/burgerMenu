@@ -58,14 +58,14 @@ export function ItemShowcase({ item }: { item: MenuItem }) {
     <div className="relative flex h-full flex-col overflow-y-auto bg-cream">
       <div className="absolute inset-0 bg-grain opacity-30" aria-hidden />
 
-      <div className="relative mx-auto flex w-full max-w-3xl flex-col gap-6 px-5 py-6 sm:px-10 sm:py-10">
+      <div className="relative mx-auto flex w-full max-w-3xl flex-col gap-4 px-4 py-4 sm:gap-6 sm:px-10 sm:py-10">
         {/* Image */}
         <div className="relative">
           <div
             className="absolute -inset-6 -z-10 rounded-full bg-mustard/30 blur-3xl"
             aria-hidden
           />
-          <div className="relative aspect-square w-full max-w-md mx-auto overflow-hidden rounded-[2rem] shadow-[0_30px_60px_-20px_rgba(26,22,20,0.4)]">
+          <div className="relative mx-auto aspect-square w-full max-w-[260px] overflow-hidden rounded-[1.75rem] shadow-[0_25px_55px_-20px_rgba(26,22,20,0.4)] sm:max-w-md sm:rounded-[2rem]">
             <MenuImage
               key={item.id}
               id={item.id}
@@ -103,9 +103,9 @@ export function ItemShowcase({ item }: { item: MenuItem }) {
         </div>
 
         {/* Title + price */}
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
           <div className="min-w-0">
-            <h2 className="font-display text-4xl leading-[0.95] tracking-tight text-charcoal sm:text-5xl">
+            <h2 className="font-display text-[2rem] leading-[0.95] tracking-tight text-charcoal sm:text-5xl">
               {item.name}
             </h2>
             {item.nameNp && (
@@ -113,11 +113,15 @@ export function ItemShowcase({ item }: { item: MenuItem }) {
                 {item.nameNp}
               </p>
             )}
+            <div className="mt-2 flex items-center gap-2 sm:hidden">
+              <VegDot isVeg={item.isVeg} />
+              <SpiceLevel level={item.spiceLevel} />
+            </div>
           </div>
-          <div className="flex shrink-0 flex-col items-end gap-2">
+          <div className="flex flex-row items-baseline justify-between gap-2 sm:flex-col sm:items-end">
             <div className="flex items-baseline gap-2">
               {item.originalPrice && (
-                <span className="font-display text-lg text-charcoal/50 line-through">
+                <span className="font-display text-base text-charcoal/50 line-through sm:text-lg">
                   Rs. {item.originalPrice}
                 </span>
               )}
@@ -125,14 +129,14 @@ export function ItemShowcase({ item }: { item: MenuItem }) {
                 {formatNpr(unitPrice)}
               </span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="hidden items-center gap-2 sm:flex">
               <VegDot isVeg={item.isVeg} />
               <SpiceLevel level={item.spiceLevel} />
             </div>
           </div>
         </div>
 
-        <p className="max-w-prose text-base leading-relaxed text-charcoal/75">
+        <p className="max-w-prose text-sm leading-relaxed text-charcoal/75 sm:text-base">
           {item.longDesc}
         </p>
 
@@ -230,9 +234,11 @@ export function ItemShowcase({ item }: { item: MenuItem }) {
 
       {/* Sticky bottom bar */}
       <div className="sticky bottom-0 z-10 mt-auto border-t border-charcoal/10 bg-cream/95 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-5 py-3 sm:px-10 sm:py-4">
-          <div className="flex items-center gap-3">
-            <QtyStepper qty={qty} setQty={setQty} />
+        <div className="mx-auto flex w-full max-w-3xl items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-10 sm:py-4">
+          <QtyStepper qty={qty} setQty={setQty} />
+
+          {/* Desktop: separate subtotal + 2 buttons */}
+          <div className="ml-2 hidden flex-1 items-center justify-end gap-3 sm:flex">
             <div className="leading-tight">
               <p className="text-[10px] uppercase tracking-widest text-charcoal/55">
                 Subtotal
@@ -241,8 +247,6 @@ export function ItemShowcase({ item }: { item: MenuItem }) {
                 {formatNpr(total)}
               </p>
             </div>
-          </div>
-          <div className="flex flex-col gap-2 sm:flex-row">
             <Button
               variant="mustard"
               size="lg"
@@ -258,6 +262,30 @@ export function ItemShowcase({ item }: { item: MenuItem }) {
               WhatsApp
             </Button>
           </div>
+
+          {/* Mobile: combined Add (price baked in) + WA icon */}
+          <button
+            onClick={() => {
+              addLine(item, qty, selectedAddOns, mealdeal);
+              setQty(1);
+              setSelectedAddOns([]);
+            }}
+            className="flex flex-1 items-center justify-between gap-2 rounded-full bg-mustard px-4 py-2.5 text-sm font-bold uppercase tracking-wide text-charcoal shadow-md transition-all hover:bg-mustard-600 active:scale-[0.98] sm:hidden"
+          >
+            <span>Add</span>
+            <span className="font-display text-lg normal-case tracking-normal">
+              {formatNpr(total)}
+            </span>
+          </button>
+          <button
+            onClick={onWhatsApp}
+            aria-label="Order on WhatsApp"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#25D366] text-white shadow-md transition hover:bg-[#1ebe57] active:scale-[0.98] sm:hidden"
+          >
+            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden>
+              <path d="M19.05 4.91A10 10 0 0 0 12 2C6.5 2 2 6.5 2 12c0 1.78.47 3.45 1.27 4.9L2 22l5.25-1.38A10 10 0 0 0 12 22c5.5 0 10-4.5 10-10 0-2.67-1.04-5.18-2.95-7.09ZM12 20.13a8.13 8.13 0 0 1-4.14-1.13l-.3-.18-3.12.82.84-3.04-.2-.31A8.13 8.13 0 1 1 20.13 12c0 4.49-3.65 8.13-8.13 8.13Zm4.45-6.08c-.24-.12-1.44-.71-1.66-.79-.22-.08-.38-.12-.55.12-.16.24-.63.79-.77.95-.14.16-.28.18-.52.06-.24-.12-1.02-.38-1.94-1.2-.72-.64-1.2-1.43-1.34-1.67-.14-.24-.02-.37.1-.49.1-.1.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.32-.75-1.81-.2-.48-.4-.41-.55-.42-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2 0 1.18.86 2.32.98 2.48.12.16 1.7 2.6 4.12 3.65 1.97.86 2.37.69 2.8.65.42-.04 1.44-.59 1.64-1.16.2-.57.2-1.05.14-1.16-.06-.1-.22-.16-.46-.28Z" />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
@@ -315,20 +343,18 @@ function ToggleOption({
     <button
       onClick={onClick}
       className={cn(
-        "flex flex-col items-start gap-1 rounded-xl px-4 py-3 text-left transition-all",
+        "flex min-w-0 flex-col items-start gap-0.5 rounded-xl px-3 py-2.5 text-left transition-all sm:gap-1 sm:px-4 sm:py-3",
         active
-          ? highlight
-            ? "bg-charcoal text-cream shadow-md"
-            : "bg-charcoal text-cream shadow-md"
+          ? "bg-charcoal text-cream shadow-md"
           : "bg-transparent text-charcoal/70 hover:bg-cream-200",
       )}
     >
-      <span className="flex items-center gap-1.5 font-display text-base tracking-wide">
-        {title}
+      <span className="flex w-full items-center gap-1 truncate font-display text-sm tracking-wide sm:text-base">
+        <span className="truncate">{title}</span>
         {highlight && (
           <span
             className={cn(
-              "rounded-full px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-widest",
+              "ml-auto hidden rounded-full px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-widest sm:inline-block",
               active ? "bg-sunshine text-charcoal" : "bg-mustard text-charcoal",
             )}
           >
@@ -336,10 +362,10 @@ function ToggleOption({
           </span>
         )}
       </span>
-      <span className="text-[10px] uppercase tracking-widest opacity-70">
+      <span className="line-clamp-1 text-[9px] uppercase tracking-widest opacity-70 sm:text-[10px]">
         {subtitle}
       </span>
-      <span className="font-display text-xl">{formatNpr(price)}</span>
+      <span className="font-display text-lg sm:text-xl">{formatNpr(price)}</span>
     </button>
   );
 }

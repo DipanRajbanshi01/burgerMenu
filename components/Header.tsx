@@ -1,6 +1,6 @@
 "use client";
 
-import { ShoppingBag } from "lucide-react";
+import { Menu as MenuIcon, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { config } from "@/data/config";
 import { useOrder } from "@/context/OrderContext";
@@ -12,30 +12,48 @@ import {
 } from "@/lib/whatsapp";
 import { formatNpr } from "@/lib/utils";
 
-export function Header() {
+export function Header({ onOpenMenu }: { onOpenMenu?: () => void }) {
   const { lines, openDrawer } = useOrder();
   const count = orderCount(lines);
   const total = orderTotal(lines);
 
   return (
-    <header className="sticky top-0 z-40 h-16 shrink-0 border-b border-charcoal/10 bg-cream/85 backdrop-blur-md">
-      <div className="mx-auto flex h-full max-w-[1400px] items-center justify-between gap-4 px-5 sm:px-8">
-        <a href="#" className="flex items-center gap-3">
-          <span className="grid h-10 w-10 place-items-center rounded-full bg-charcoal font-display text-base text-mustard shadow-md">
-            Jy
-          </span>
-          <span className="hidden flex-col leading-tight sm:flex">
-            <span className="font-display text-lg text-charcoal">
-              {config.brandName}
+    <header className="sticky top-0 z-40 h-14 shrink-0 border-b border-charcoal/10 bg-cream/90 backdrop-blur-md sm:h-16">
+      <div className="mx-auto flex h-full max-w-[1400px] items-center justify-between gap-2 px-3 sm:gap-4 sm:px-8">
+        <div className="flex items-center gap-2">
+          {/* Mobile-only menu trigger */}
+          {onOpenMenu && (
+            <button
+              onClick={onOpenMenu}
+              className="grid h-10 w-10 place-items-center rounded-full bg-mustard text-charcoal shadow-sm transition hover:bg-mustard-600 md:hidden"
+              aria-label="Open menu"
+            >
+              <MenuIcon className="h-5 w-5" />
+            </button>
+          )}
+
+          <a href="#" className="flex items-center gap-2">
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-charcoal font-display text-base text-mustard shadow-md sm:h-10 sm:w-10">
+              Jy
             </span>
-            <span className="text-[10px] uppercase tracking-[0.2em] text-charcoal/50">
-              Cloud kitchen · Kathmandu
+            <span className="hidden flex-col leading-tight md:flex">
+              <span className="font-display text-lg text-charcoal">
+                {config.brandName}
+              </span>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-charcoal/50">
+                Cloud kitchen · Kathmandu
+              </span>
             </span>
-          </span>
-        </a>
+          </a>
+        </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <Button asChild variant="whatsapp" size="sm" className="hidden sm:inline-flex">
+          <Button
+            asChild
+            variant="whatsapp"
+            size="sm"
+            className="hidden sm:inline-flex"
+          >
             <a
               href={whatsappUrl(buildOrderMessage(lines))}
               target="_blank"
@@ -46,7 +64,7 @@ export function Header() {
           </Button>
           <button
             onClick={openDrawer}
-            className="group relative inline-flex h-11 items-center gap-2 rounded-full border border-charcoal/15 bg-cream px-3 pr-4 text-sm font-bold uppercase tracking-wide text-charcoal shadow-sm transition hover:border-charcoal/30 hover:shadow-md sm:px-4"
+            className="group relative inline-flex h-10 items-center gap-2 rounded-full border border-charcoal/15 bg-cream pl-2 pr-3 text-sm font-bold uppercase tracking-wide text-charcoal shadow-sm transition hover:border-charcoal/30 hover:shadow-md sm:h-11 sm:pl-3 sm:pr-4"
           >
             <span className="grid h-7 w-7 place-items-center rounded-full bg-charcoal text-cream">
               <ShoppingBag className="h-3.5 w-3.5" />
