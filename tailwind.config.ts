@@ -61,11 +61,16 @@ const config: Config = {
           from: { opacity: "0", transform: "translateY(12px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
+        "sheet-up": {
+          from: { transform: "translateY(100%)" },
+          to: { transform: "translateY(0)" },
+        },
       },
       animation: {
         "fade-in": "fade-in 200ms ease-out",
         "scale-in": "scale-in 180ms ease-out",
         "slide-up": "slide-up 220ms ease-out",
+        "sheet-up": "sheet-up 320ms cubic-bezier(0.32, 0.72, 0, 1)",
       },
     },
   },

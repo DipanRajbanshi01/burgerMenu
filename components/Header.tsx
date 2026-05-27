@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu as MenuIcon, ShoppingBag } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { config } from "@/data/config";
 import { useOrder } from "@/context/OrderContext";
@@ -12,7 +12,7 @@ import {
 } from "@/lib/whatsapp";
 import { formatNpr } from "@/lib/utils";
 
-export function Header({ onOpenMenu }: { onOpenMenu?: () => void }) {
+export function Header() {
   const { lines, openDrawer } = useOrder();
   const count = orderCount(lines);
   const total = orderTotal(lines);
@@ -20,32 +20,19 @@ export function Header({ onOpenMenu }: { onOpenMenu?: () => void }) {
   return (
     <header className="sticky top-0 z-40 h-14 shrink-0 border-b border-charcoal/10 bg-cream/90 backdrop-blur-md sm:h-16">
       <div className="mx-auto flex h-full max-w-[1400px] items-center justify-between gap-2 px-3 sm:gap-4 sm:px-8">
-        <div className="flex items-center gap-2">
-          {/* Mobile-only menu trigger */}
-          {onOpenMenu && (
-            <button
-              onClick={onOpenMenu}
-              className="grid h-10 w-10 place-items-center rounded-full bg-mustard text-charcoal shadow-sm transition hover:bg-mustard-600 md:hidden"
-              aria-label="Open menu"
-            >
-              <MenuIcon className="h-5 w-5" />
-            </button>
-          )}
-
-          <a href="#" className="flex items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-charcoal font-display text-base text-mustard shadow-md sm:h-10 sm:w-10">
-              Jy
+        <a href="#" className="flex items-center gap-2">
+          <span className="grid h-9 w-9 place-items-center rounded-full bg-charcoal font-display text-base text-mustard shadow-md sm:h-10 sm:w-10">
+            Jy
+          </span>
+          <span className="flex flex-col leading-tight">
+            <span className="font-display text-base text-charcoal sm:text-lg">
+              {config.brandName}
             </span>
-            <span className="hidden flex-col leading-tight md:flex">
-              <span className="font-display text-lg text-charcoal">
-                {config.brandName}
-              </span>
-              <span className="text-[10px] uppercase tracking-[0.2em] text-charcoal/50">
-                Cloud kitchen · Kathmandu
-              </span>
+            <span className="hidden text-[10px] uppercase tracking-[0.2em] text-charcoal/50 sm:block">
+              Cloud kitchen · Kathmandu
             </span>
-          </a>
-        </div>
+          </span>
+        </a>
 
         <div className="flex items-center gap-2 sm:gap-3">
           <Button
