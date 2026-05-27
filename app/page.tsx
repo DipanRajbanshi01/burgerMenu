@@ -19,7 +19,16 @@ export default function Page() {
 
   const handleSelect = (item: MenuItem) => {
     setActiveId(item.id);
-    setItemOpen(true);
+    // The full-screen item overlay only exists on mobile. On desktop the
+    // showcase is already visible in the side-by-side grid, so we keep
+    // itemOpen=false — otherwise the body-scroll-lock effect below would
+    // lock desktop scrolling on the first tap and never release it.
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(max-width: 767px)").matches
+    ) {
+      setItemOpen(true);
+    }
   };
 
   const handleGoHome = () => {
