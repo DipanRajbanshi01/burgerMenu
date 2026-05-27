@@ -26,10 +26,15 @@ export default function Page() {
     setItemOpen(false);
     setActiveId(menu[0].id);
     closeDrawer();
-    const scroller = document.querySelector<HTMLElement>(
-      "[data-menu-scroll]",
-    );
-    scroller?.scrollTo({ top: 0, behavior: "smooth" });
+
+    // Scroll the window and every internal scroller back to the top.
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    document.documentElement.scrollTo({ top: 0, behavior: "smooth" });
+    document
+      .querySelectorAll<HTMLElement>(
+        "[data-menu-scroll], [data-showcase-scroll]",
+      )
+      .forEach((el) => el.scrollTo({ top: 0, behavior: "smooth" }));
   };
 
   // Lock body scroll while the mobile item overlay is open

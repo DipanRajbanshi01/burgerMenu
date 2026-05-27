@@ -55,7 +55,10 @@ export function ItemShowcase({ item }: { item: MenuItem }) {
   };
 
   return (
-    <div className="relative flex h-full flex-col overflow-y-auto bg-cream">
+    <div
+      data-showcase-scroll
+      className="relative flex h-full flex-col overflow-y-auto bg-cream"
+    >
       <div className="absolute inset-0 bg-grain opacity-30" aria-hidden />
 
       <div className="relative mx-auto flex w-full max-w-3xl flex-col gap-4 px-4 py-4 sm:gap-6 sm:px-10 sm:py-10">
