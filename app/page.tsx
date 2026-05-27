@@ -68,9 +68,12 @@ export default function Page() {
           <MenuList activeId={activeId} onSelect={handleSelect} />
         </div>
 
-        {/* Desktop showcase — side-by-side with the menu on md+ */}
+        {/* Desktop showcase — side-by-side with the menu on md+.
+            Keying on activeItem.id forces a remount per item so the
+            showcase always opens at the photo, never at the previous
+            item's scroll position. */}
         <div className="hidden md:block md:h-full md:overflow-hidden">
-          <ItemShowcase item={activeItem} />
+          <ItemShowcase key={activeItem.id} item={activeItem} />
         </div>
       </main>
 
