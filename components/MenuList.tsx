@@ -183,7 +183,7 @@ function MenuRow({
   return (
     <li
       className={cn(
-        "group flex items-center gap-1 rounded-xl pr-1.5 transition-all",
+        "group flex items-stretch gap-1 rounded-xl pr-1 transition-all",
         active ? "bg-charcoal text-cream shadow-lg" : "hover:bg-charcoal/10",
       )}
     >
@@ -214,70 +214,101 @@ function MenuRow({
             </span>
           )}
         </span>
-
-        <PriceCol label="Base" value={item.price} active={active} />
-        {hasMealdeal ? (
-          <PriceCol
-            label="Mealdeal"
-            value={item.mealdealPrice!}
-            active={active}
-            accent
-          />
-        ) : item.comesWithCombo ? (
-          <span
-            className={cn(
-              "shrink-0 self-center rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.15em]",
-              active
-                ? "bg-sunshine text-charcoal"
-                : "bg-charcoal text-cream",
-            )}
-          >
-            Combo
-          </span>
-        ) : (
-          <span className="w-[60px] shrink-0" aria-hidden />
-        )}
       </button>
-      <AddControl item={item} active={active} />
+
+      <TieredButton item={item} tier="base" active={active} />
+      {hasMealdeal && (
+        <TieredButton item={item} tier="mealdeal" active={active} />
+      )}
     </li>
   );
 }
 
-function AddControl({
+/**
+ * Tap-to-add price column. Shows the price (Base / Mealdeal / Combo) as a
+ * tappable pill; once added it switches to a mini [- qty +] stepper for
+ * that specific tier so users can manage Base and Mealdeal independently
+ * (they end up as separate cart lines).
+ */
+function TieredButton({
   item,
+  tier,
   active,
 }: {
   item: MenuItem;
+  tier: "base" | "mealdeal";
   active: boolean;
 }) {
   const { lines, addLine, updateQty } = useOrder();
+  const mealdeal = tier === "mealdeal";
+  const price = mealdeal ? item.mealdealPrice! : item.price;
+  const hasMealdeal = Boolean(item.mealdealPrice);
 
-  // Quick-add operates on the "default" line — no add-ons, base price.
-  // Items configured via the showcase (mealdeal / add-ons) live on their
-  // own lines and aren't touched here.
-  const defaultLine = lines.find(
-    (l) => l.item.id === item.id && !l.mealdeal && l.addOns.length === 0,
+  const label = mealdeal
+    ? "Mealdeal"
+    : hasMealdeal
+      ? "Base"
+      : item.comesWithCombo
+        ? "Combo"
+        : "";
+
+  const matchingLine = lines.find(
+    (l) =>
+      l.item.id === item.id &&
+      l.mealdeal === mealdeal &&
+      l.addOns.length === 0,
   );
-  const qty = defaultLine?.qty ?? 0;
+  const qty = matchingLine?.qty ?? 0;
 
   const stop = (e: React.MouseEvent) => e.stopPropagation();
+
+  const container =
+    "flex w-[58px] shrink-0 flex-col items-center justify-center gap-0.5 rounded-lg border-2 px-1 py-1 transition-all sm:w-[78px]";
 
   if (qty === 0) {
     return (
       <button
         onClick={(e) => {
           stop(e);
-          addLine(item, 1, [], false);
+          addLine(item, 1, [], mealdeal);
         }}
-        aria-label={`Add ${item.name} to order`}
+        aria-label={`Add ${item.name}${label ? ` (${label})` : ""} to order`}
         className={cn(
-          "grid h-8 w-8 shrink-0 place-items-center rounded-full shadow-sm transition-all active:scale-90",
-          active
-            ? "bg-mustard text-charcoal hover:bg-mustard-600"
-            : "bg-charcoal text-cream hover:bg-charcoal-800",
+          container,
+          "hover:scale-[1.03] active:scale-95",
+          mealdeal
+            ? active
+              ? "border-sunshine/60 bg-cream/10 hover:bg-cream/15"
+              : "border-tomato/40 bg-tomato/5 hover:border-tomato hover:bg-tomato/10"
+            : active
+              ? "border-cream/30 bg-cream/10 hover:bg-cream/15"
+              : "border-charcoal/20 bg-cream/40 hover:border-charcoal/40 hover:bg-cream",
         )}
       >
-        <Plus className="h-4 w-4" strokeWidth={3} />
+        {label && (
+          <span
+            className={cn(
+              "hidden text-[8px] font-bold uppercase leading-none tracking-[0.15em] sm:block",
+              active ? "text-cream/60" : "text-charcoal/50",
+            )}
+          >
+            {label}
+          </span>
+        )}
+        <span
+          className={cn(
+            "font-display tabular-nums leading-none text-[13px] sm:text-[15px]",
+            mealdeal
+              ? active
+                ? "text-sunshine"
+                : "text-tomato-600"
+              : active
+                ? "text-cream"
+                : "text-charcoal/80",
+          )}
+        >
+          {formatNpr(price).replace("Rs. ", "")}
+        </span>
       </button>
     );
   }
@@ -285,81 +316,57 @@ function AddControl({
   return (
     <div
       className={cn(
-        "inline-flex shrink-0 items-center rounded-full shadow-sm",
-        active ? "bg-mustard text-charcoal" : "bg-charcoal text-cream",
+        container,
+        mealdeal
+          ? "border-tomato bg-tomato/20 shadow-sm"
+          : "border-charcoal bg-charcoal/10 shadow-sm",
       )}
     >
-      <button
-        onClick={(e) => {
-          stop(e);
-          updateQty(defaultLine!.lineId, qty - 1);
-        }}
-        aria-label={
-          qty === 1
-            ? `Remove ${item.name} from order`
-            : `Decrease quantity of ${item.name}`
-        }
-        className="grid h-8 w-7 place-items-center rounded-l-full transition hover:opacity-80 active:scale-90"
-      >
-        {qty === 1 ? (
-          <Trash2 className="h-3.5 w-3.5" />
-        ) : (
-          <Minus className="h-3.5 w-3.5" strokeWidth={3} />
+      {label && (
+        <span
+          className={cn(
+            "hidden text-[8px] font-bold uppercase leading-none tracking-[0.15em] sm:block",
+            active ? "text-cream/60" : "text-charcoal/55",
+          )}
+        >
+          {label}
+        </span>
+      )}
+      <div
+        className={cn(
+          "inline-flex items-center rounded-full text-cream shadow-sm",
+          mealdeal ? "bg-tomato" : "bg-charcoal",
         )}
-      </button>
-      <span className="w-5 text-center font-display text-sm tabular-nums">
-        {qty}
-      </span>
-      <button
-        onClick={(e) => {
-          stop(e);
-          updateQty(defaultLine!.lineId, qty + 1);
-        }}
-        aria-label={`Add another ${item.name}`}
-        className="grid h-8 w-7 place-items-center rounded-r-full transition hover:opacity-80 active:scale-90"
       >
-        <Plus className="h-3.5 w-3.5" strokeWidth={3} />
-      </button>
+        <button
+          onClick={(e) => {
+            stop(e);
+            updateQty(matchingLine!.lineId, qty - 1);
+          }}
+          aria-label={qty === 1 ? "Remove from order" : "Decrease quantity"}
+          className="grid h-6 w-5 place-items-center rounded-l-full transition hover:opacity-80 active:scale-90"
+        >
+          {qty === 1 ? (
+            <Trash2 className="h-2.5 w-2.5" />
+          ) : (
+            <Minus className="h-2.5 w-2.5" strokeWidth={3} />
+          )}
+        </button>
+        <span className="min-w-[14px] px-0.5 text-center font-display text-[11px] leading-none tabular-nums">
+          {qty}
+        </span>
+        <button
+          onClick={(e) => {
+            stop(e);
+            updateQty(matchingLine!.lineId, qty + 1);
+          }}
+          aria-label="Increase quantity"
+          className="grid h-6 w-5 place-items-center rounded-r-full transition hover:opacity-80 active:scale-90"
+        >
+          <Plus className="h-2.5 w-2.5" strokeWidth={3} />
+        </button>
+      </div>
     </div>
-  );
-}
-
-function PriceCol({
-  label,
-  value,
-  active,
-  accent,
-}: {
-  label: string;
-  value: number;
-  active: boolean;
-  accent?: boolean;
-}) {
-  return (
-    <span className="flex w-[60px] shrink-0 flex-col items-end leading-tight sm:w-[78px]">
-      <span
-        className={cn(
-          "text-[8px] font-bold uppercase tracking-[0.15em]",
-          active ? "text-cream/55" : "text-charcoal/45",
-        )}
-      >
-        {label}
-      </span>
-      <span
-        className={cn(
-          "font-display tabular-nums text-[13px] sm:text-[15px]",
-          accent
-            ? active
-              ? "text-sunshine"
-              : "text-charcoal"
-            : active
-              ? "text-cream"
-              : "text-charcoal/80",
-        )}
-      >
-        {formatNpr(value).replace("Rs. ", "")}
-      </span>
-    </span>
   );
 }
 
