@@ -1,11 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { Search, Sparkles } from "lucide-react";
+import { Minus, Plus, Search, Sparkles, Trash2 } from "lucide-react";
 import { menu, type Category, type MenuItem } from "@/data/menu";
 import { config } from "@/data/config";
 import { formatNpr, cn } from "@/lib/utils";
 import { getKitchenStatus, type KitchenStatus } from "@/lib/hours";
+import { useOrder } from "@/context/OrderContext";
 import { VegDot } from "@/components/VegDot";
 
 const sectionOrder: { id: Category; label: string }[] = [
@@ -180,15 +181,15 @@ function MenuRow({
   const hasMealdeal = Boolean(item.mealdealPrice);
 
   return (
-    <li>
+    <li
+      className={cn(
+        "group flex items-center gap-1 rounded-xl pr-1.5 transition-all",
+        active ? "bg-charcoal text-cream shadow-lg" : "hover:bg-charcoal/10",
+      )}
+    >
       <button
         onClick={onClick}
-        className={cn(
-          "group flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-left transition-all",
-          active
-            ? "bg-charcoal text-cream shadow-lg"
-            : "hover:bg-charcoal/10",
-        )}
+        className="flex min-w-0 flex-1 items-center gap-3 rounded-xl px-2.5 py-2 text-left"
       >
         <VegDot isVeg={item.isVeg} />
         <span className="min-w-0 flex-1 leading-tight">
@@ -237,7 +238,89 @@ function MenuRow({
           <span className="w-[60px] shrink-0" aria-hidden />
         )}
       </button>
+      <AddControl item={item} active={active} />
     </li>
+  );
+}
+
+function AddControl({
+  item,
+  active,
+}: {
+  item: MenuItem;
+  active: boolean;
+}) {
+  const { lines, addLine, updateQty } = useOrder();
+
+  // Quick-add operates on the "default" line — no add-ons, base price.
+  // Items configured via the showcase (mealdeal / add-ons) live on their
+  // own lines and aren't touched here.
+  const defaultLine = lines.find(
+    (l) => l.item.id === item.id && !l.mealdeal && l.addOns.length === 0,
+  );
+  const qty = defaultLine?.qty ?? 0;
+
+  const stop = (e: React.MouseEvent) => e.stopPropagation();
+
+  if (qty === 0) {
+    return (
+      <button
+        onClick={(e) => {
+          stop(e);
+          addLine(item, 1, [], false);
+        }}
+        aria-label={`Add ${item.name} to order`}
+        className={cn(
+          "grid h-8 w-8 shrink-0 place-items-center rounded-full shadow-sm transition-all active:scale-90",
+          active
+            ? "bg-mustard text-charcoal hover:bg-mustard-600"
+            : "bg-charcoal text-cream hover:bg-charcoal-800",
+        )}
+      >
+        <Plus className="h-4 w-4" strokeWidth={3} />
+      </button>
+    );
+  }
+
+  return (
+    <div
+      className={cn(
+        "inline-flex shrink-0 items-center rounded-full shadow-sm",
+        active ? "bg-mustard text-charcoal" : "bg-charcoal text-cream",
+      )}
+    >
+      <button
+        onClick={(e) => {
+          stop(e);
+          updateQty(defaultLine!.lineId, qty - 1);
+        }}
+        aria-label={
+          qty === 1
+            ? `Remove ${item.name} from order`
+            : `Decrease quantity of ${item.name}`
+        }
+        className="grid h-8 w-7 place-items-center rounded-l-full transition hover:opacity-80 active:scale-90"
+      >
+        {qty === 1 ? (
+          <Trash2 className="h-3.5 w-3.5" />
+        ) : (
+          <Minus className="h-3.5 w-3.5" strokeWidth={3} />
+        )}
+      </button>
+      <span className="w-5 text-center font-display text-sm tabular-nums">
+        {qty}
+      </span>
+      <button
+        onClick={(e) => {
+          stop(e);
+          updateQty(defaultLine!.lineId, qty + 1);
+        }}
+        aria-label={`Add another ${item.name}`}
+        className="grid h-8 w-7 place-items-center rounded-r-full transition hover:opacity-80 active:scale-90"
+      >
+        <Plus className="h-3.5 w-3.5" strokeWidth={3} />
+      </button>
+    </div>
   );
 }
 
