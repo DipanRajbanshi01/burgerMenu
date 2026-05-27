@@ -128,7 +128,10 @@ export function MenuList({
       </div>
 
       {/* Scrollable list */}
-      <div className="relative mt-4 flex-1 overflow-y-auto px-5 pb-6 sm:px-8">
+      <div
+        data-menu-scroll
+        className="relative mt-4 flex-1 overflow-y-auto px-5 pb-6 sm:px-8"
+      >
         {grouped.length === 0 ? (
           <p className="py-12 text-center text-sm text-charcoal/60">
             Nothing matches "{query}".

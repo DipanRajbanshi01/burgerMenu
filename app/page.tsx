@@ -6,9 +6,11 @@ import { Header } from "@/components/Header";
 import { MenuList } from "@/components/MenuList";
 import { ItemShowcase } from "@/components/ItemShowcase";
 import { OrderBar } from "@/components/OrderBar";
+import { useOrder } from "@/context/OrderContext";
 import { menu, type MenuItem } from "@/data/menu";
 
 export default function Page() {
+  const { closeDrawer } = useOrder();
   const [activeId, setActiveId] = React.useState<string>(menu[0].id);
   const [itemOpen, setItemOpen] = React.useState(false);
 
@@ -18,6 +20,16 @@ export default function Page() {
   const handleSelect = (item: MenuItem) => {
     setActiveId(item.id);
     setItemOpen(true);
+  };
+
+  const handleGoHome = () => {
+    setItemOpen(false);
+    setActiveId(menu[0].id);
+    closeDrawer();
+    const scroller = document.querySelector<HTMLElement>(
+      "[data-menu-scroll]",
+    );
+    scroller?.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // Lock body scroll while the mobile item overlay is open
@@ -43,7 +55,7 @@ export default function Page() {
 
   return (
     <div className="flex h-full min-h-screen flex-col">
-      <Header />
+      <Header onGoHome={handleGoHome} />
 
       <main className="flex-1 md:grid md:h-[calc(100vh-4rem)] md:grid-cols-[minmax(300px,38%)_1fr] md:overflow-hidden">
         {/* Menu — always rendered. On mobile this is the default view. */}

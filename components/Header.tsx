@@ -12,7 +12,7 @@ import {
 } from "@/lib/whatsapp";
 import { formatNpr } from "@/lib/utils";
 
-export function Header() {
+export function Header({ onGoHome }: { onGoHome?: () => void }) {
   const { lines, openDrawer } = useOrder();
   const count = orderCount(lines);
   const total = orderTotal(lines);
@@ -20,11 +20,16 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 h-14 shrink-0 border-b border-charcoal/10 bg-cream/90 backdrop-blur-md sm:h-16">
       <div className="mx-auto flex h-full max-w-[1400px] items-center justify-between gap-2 px-3 sm:gap-4 sm:px-8">
-        <a href="#" className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={onGoHome}
+          aria-label={`${config.brandName} — back to menu`}
+          className="flex items-center gap-2 rounded-full transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mustard focus-visible:ring-offset-2"
+        >
           <span className="grid h-9 w-9 place-items-center rounded-full bg-charcoal font-display text-base text-mustard shadow-md sm:h-10 sm:w-10">
             Jy
           </span>
-          <span className="flex flex-col leading-tight">
+          <span className="flex flex-col items-start leading-tight">
             <span className="font-display text-base text-charcoal sm:text-lg">
               {config.brandName}
             </span>
@@ -32,7 +37,7 @@ export function Header() {
               Cloud kitchen · Kathmandu
             </span>
           </span>
-        </a>
+        </button>
 
         <div className="flex items-center gap-2 sm:gap-3">
           <Button
