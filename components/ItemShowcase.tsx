@@ -15,6 +15,7 @@ import type { AddOn, MenuItem } from "@/data/menu";
 
 export function ItemShowcase({ item }: { item: MenuItem }) {
   const { addLine } = useOrder();
+  const rootRef = React.useRef<HTMLDivElement>(null);
   const [qty, setQty] = React.useState(1);
   const [selectedAddOns, setSelectedAddOns] = React.useState<AddOn[]>([]);
   const [mealdeal, setMealdeal] = React.useState(false);
@@ -27,6 +28,11 @@ export function ItemShowcase({ item }: { item: MenuItem }) {
     setSelectedAddOns([]);
     setMealdeal(false);
     setLiked(false);
+    // Reset the internal scroll so a new item always opens at the photo,
+    // not at wherever the previous item happened to be scrolled to.
+    if (rootRef.current) {
+      rootRef.current.scrollTop = 0;
+    }
   }, [item.id]);
 
   const unitPrice =
@@ -56,6 +62,7 @@ export function ItemShowcase({ item }: { item: MenuItem }) {
 
   return (
     <div
+      ref={rootRef}
       data-showcase-scroll
       className="relative flex h-full flex-col overflow-y-auto bg-cream"
     >
